@@ -32,8 +32,8 @@ class Reader:
                     status[check] += 1
                 f.write(f'Passed {status[1]}/{sum(status)}') # Use sum(status) instead of len(checks) because O(1) is better than O(n)
 
-            with open(self.file_path, 'r') as f:
-                self.contents = "".join(f.readlines()).strip('\n ')
+        with open(self.file_path, 'r') as f:
+            self.contents = "".join(f.readlines()).strip('\n ')
     
     def peek(self, position: int = 0) -> str | OutOfRangeError:
         if 0 <= position < self.curr_length:
@@ -52,5 +52,8 @@ class Reader:
     def is_eof(self) -> bool:
         return self.curr_length == 0
 
-    def first_instance_of(self, character: str) -> int:
-        return self.contents.index(character)
+    def first_instance_of(self, character: str) -> int: 
+        try:
+            return self.contents.index(character)
+        except ValueError:
+            print(f"Couldn't find {character} in {self.contents}")

@@ -1,1 +1,3 @@
-!!f:mn:{}
+!!f:mn:{
+    !co:<<Hello World>>;
+}

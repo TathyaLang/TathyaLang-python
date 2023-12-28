@@ -13,14 +13,20 @@ class Lexer:
         return str(self.position)
     
     def lex(self):
-        if self.reader.is_eof: return
+        if self.reader.is_eof: 
+            Lexer.tokens.append({
+                "type": "EOF",
+                "value": "EOF",
+                "position": self.string_position
+            })
+            return
         for token in TOKEN_LIST:
             if self.reader.contents.startswith(token.text):
-                token_obj = query(token.text)
-                if token_obj.ending_char:
-                    string_pos = "{}>{}".format( self.position, self.position + self.reader.first_instance_of(token_obj.ending_char) )
+                if token == -1: return f"{token.text} not found"
+                if token.ending_char:
+                    string_pos = "{}>{}".format( self.position, self.position + self.reader.first_instance_of(token.ending_char) + len(token.ending_char) )
                     value = self.reader.contents[:self.reader.first_instance_of(token.ending_char)]
-                    consume_len = self.reader.first_instance_of(token_obj.ending_char)
+                    consume_len = self.reader.first_instance_of(token.ending_char) + len(token.ending_char)
                 else:
                     string_pos = self.string_position
                     value = token.text
@@ -33,7 +39,10 @@ class Lexer:
                 })
                 break
         else:
-            ending_pos = self.reader.first_instance_of(SEPARATOR.text)
+            if not token.include_ending_char:
+                ending_pos = self.reader.first_instance_of(SEPARATOR.text)
+            else:
+                ending_pos = self.reader.first_instance_of(token.ending_char) + len(token.ending_char) - 1
             Lexer.tokens.append({
                 "type": "name/text",
                 "value": self.reader.contents[:ending_pos],
