@@ -2,14 +2,15 @@ import os
 import time
 from helpers import OutOfRangeError
 
+
 class Reader:
     def __init__(self, file_path: str | os.PathLike, **kwargs) -> None:
         self.file_path = file_path
         self.contents: str = None
         
         self.make_logs = kwargs.get("make_logs", True)
-
-        self.initialize()
+        if kwargs.get("initialize", True):
+            self.initialize()
 
     @property
     def file_exists(self) -> bool:
@@ -30,7 +31,8 @@ class Reader:
                 for name, check in checks.items():
                     f.write(f'{name}: {texts[check]}\n')
                     status[check] += 1
-                f.write(f'Passed {status[1]}/{sum(status)}') # Use sum(status) instead of len(checks) because O(1) is better than O(n)
+                f.write(f'Passed {status[1]}/{sum(status)}')
+                # Use sum(status) instead of len(checks) because O(1) is better than O(n)
 
         with open(self.file_path, 'r') as f:
             self.contents = "".join(f.readlines()).strip('\n ')
@@ -52,8 +54,24 @@ class Reader:
     def is_eof(self) -> bool:
         return self.curr_length == 0
 
-    def first_instance_of(self, character: str) -> int: 
-        try:
-            return self.contents.index(character)
-        except ValueError:
-            print(f"Couldn't find {character} in {self.contents}")
+    def first_instance_of(self, character: str | list[str]) -> int | ValueError:
+        if isinstance(character, list):
+            items = [(self.contents.index(char) if char in self.contents else float('inf')) for char in character]
+            if all([i == float('inf') for i in items]): return ValueError(f"Couldn't find any of {character!r} in {self.contents!r}")
+            return min(items)
+        if character not in self.contents:
+            return ValueError(f"Couldn't find {character!r} in {self.contents!r}")
+        return self.contents.index(character)
+
+
+class StringReader(Reader):
+    def __init__(self, text: str, offset: int) -> None:
+        super().__init__(None, initialize=False)
+        self.offset = offset
+        self.contents = text
+
+    def first_instance_of(self, character: str) -> int:
+        if isinstance((fi := super().first_instance_of(character)), int): 
+            return fi + self.offset
+        return fi
+

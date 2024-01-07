@@ -1,3 +1,3 @@
 !!f:mn:{
-    !co:<<Hello World>>, 12;
+    !co:(j=<<[]>>, p=<<TathyaLang says: >>):<<Hello World, this is test number >>, <|14|>;
 }

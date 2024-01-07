@@ -1,5 +1,7 @@
 from typing import Callable
 from helpers import int_check, float_check
+from lexer import Lexer
+from character_reader import StringReader
 
 class Function:
     def __init__(self, name: str) -> None:
@@ -65,9 +67,8 @@ class Parser:
             elif float_check(token["value"]): args.append(float(token["value"]))
             else: args.append(self.variables[token["value"]])
         return args
-    
-    def parse_kwargs(self, token_idx: int) -> dict:
-        ... # TODO
+
+    def parse_kwargs(self, token_idx: int) -> dict: return Lexer(StringReader(self.lex_output[token_idx].strip("()"))).lex().tokens
 
 class FunctionCall:
     def __init__(self, function_name: str, *args: list, **kwargs: dict) -> None:
